@@ -1,0 +1,78 @@
+version: '3.9'
+services:
+  elasticsearch:
+    container_name: elasticsearch
+    image: elasticsearch:7.13.3
+    environment:
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - 9200:9200
+      - 9300:9300
+    stdin_open: true
+    tty: true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "50"
+  kibana:
+    container_name: kibana
+    image: kibana:7.13.3
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - 5601:5601
+    stdin_open: true
+    tty: true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "50"
+  logstash:
+    container_name: logstash
+    image: logstash:7.13.3
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./observability/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./observability/logstash.template.json:/usr/share/logstash/templates/logstash.template.json
+    ports:
+      - 5044:5044
+    stdin_open: true
+    tty: true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "50"
+  filebeat:
+    user: root
+    container_name: filebeat
+    image: docker.elastic.co/beats/filebeat:7.13.3
+    volumes:
+      - /var/run/docker.sock:/host_docker/docker.sock
+      - ./service01/logs:/usr/share/filebeat/mylog
+      - ./observability/filebeat.yml:/usr/share/filebeat/filebeat.yml
+    command: ["--strict.perms=false"]
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    stdin_open: true
+    tty: true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "50"
