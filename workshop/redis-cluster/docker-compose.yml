@@ -1,0 +1,73 @@
+version: '3.9'
+services:
+  redis1:
+    image: redis:6.2.4
+    networks:
+      app_network:
+        ipv4_address: 172.16.238.10
+    volumes:
+      - ./config/node.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+  redis2:
+    image: redis:6.2.4
+    networks:
+      app_network:
+        ipv4_address: 172.16.238.11
+    volumes:
+      - ./config/node.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+  redis3:
+    image: redis:6.2.4
+    networks:
+      app_network:
+        ipv4_address: 172.16.238.12
+    volumes:
+      - ./config/node.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+  redis4:
+    image: redis:6.2.4
+    networks:
+      app_network:
+        ipv4_address: 172.16.238.13
+    volumes:
+      - ./config/node.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+  redis5:
+    image: redis:6.2.4
+    networks:
+      app_network:
+        ipv4_address: 172.16.238.14
+    volumes:
+      - ./config/node.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+  redis6:
+    image: redis:6.2.4
+    networks:
+      app_network:
+        ipv4_address: 172.16.238.15
+    volumes:
+      - ./config/node.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+  redis-cluster:
+    tty: true
+    image: redis:6.2.4
+    command: bash -c "
+       echo yes | redis-cli --cluster create 172.16.238.10:7000 172.16.238.11:7000 172.16.238.12:7000 172.16.238.13:7000 172.16.238.14:7000 172.16.238.15:7000 --cluster-replicas 1"
+    networks:
+      app_network:
+        ipv4_address: 172.16.238.16
+
+networks:
+  app_network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.16.238.0/24"
+          gateway: 172.16.238.1
